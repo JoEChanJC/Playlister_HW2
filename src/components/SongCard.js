@@ -9,6 +9,17 @@ export default class SongCard extends React.Component {
             draggedTo: false
         }
     }
+    handleClick = (event) =>{
+        if (event.detail === 2) {
+            event.stopPropagation();
+            
+            this.props.editSongCallback(this.props.song,this.props.index);
+        }
+    }
+    handleDeleteSong = (event) =>{
+        event.stopPropagation();
+        this.props.deleteSongCallback(this.props.index);
+    }
     handleDragStart = (event) => {
         event.dataTransfer.setData("song", event.target.id);
         this.setState(prevState => ({
@@ -77,14 +88,14 @@ export default class SongCard extends React.Component {
                 onDragLeave={this.handleDragLeave}
                 onDrop={this.handleDrop}
                 draggable="true"
-                
+                onClick={this.handleClick}
             >
                 {num}. <a href = {youtubeLink} >{song.title} by {song.artist}</a> 
                 <input
                         type="button"
                         id={"delete-song-" + num}
                         className="list-card-button"
-                        onClick={this.handleDeleteList}
+                        onClick={this.handleDeleteSong}
                         value={"\u2715"} />
             </div>
             
