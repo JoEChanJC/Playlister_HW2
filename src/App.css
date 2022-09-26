@@ -19,7 +19,7 @@ body {
 
 #root {
   background-color: var(--swatch-primary);
-  font-family: serif;
+  font-family: 'Tangerine';
   position: absolute;
   width: 80%;
   left: 10%;
@@ -109,10 +109,11 @@ body {
 }
 
 .list-card, .selected-list-card, .unselected-list-card {
-  font-size: 18pt;
+  font-size: 24pt;
   margin: 10px;
   padding: 20px;
   border-radius: 25px;
+  font-weight: bold;
 }
 
 .unselected-list-card:hover {
@@ -154,12 +155,19 @@ body {
 }
 
 .playlister-song, .playlister-song-dragged-to { 
-  display:flex;
-  align-items: center;
+  display: inline-block;
   font-size: 24pt;
-  height:20%;
+  margin: 8px;
+  padding: 20px;
+  border-radius: 25px;
+  background-color: var(--swatch-complement);
+  color:black;
 }
-
+.playlister-song:hover{
+  cursor: pointer;
+  background-color: var(--swatch-contrast);
+  color: white;
+}
 input {
   font-size:20pt;
 }
@@ -191,8 +199,8 @@ input {
 
 .modal-root {
   position: relative;
-  max-width: 1200vw;
-  max-height: 600vh;
+  max-width: 50%;
+  max-height: 60%;
   overflow: visible;
   display: flex;
   flex-direction: column;
@@ -206,6 +214,7 @@ input {
 
 .modal-root > * {
   padding: 1rem;
+  
 }
 
 .modal-north {
