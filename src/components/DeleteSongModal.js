@@ -4,8 +4,6 @@ export default class DeleteSongModal extends Component {
 
     render() {
         const {currentTitle, deleteSongCallback, hideDeleteSongCallback } = this.props;
-        
-        
         return (
             <div 
                 class="modal" 

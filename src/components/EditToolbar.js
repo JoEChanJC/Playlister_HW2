@@ -1,6 +1,11 @@
 import React from "react";
 
 export default class EditToolbar extends React.Component {
+
+    // handleAddSongButton= (event) => {
+    //     const { createNewSongCallback } = this.props;
+    //     createNewSongCallback();
+    // };
     render() {
         const { canAddSong, canUndo, canRedo, canClose, 
                 undoCallback, redoCallback, closeCallback} = this.props;
@@ -19,6 +24,7 @@ export default class EditToolbar extends React.Component {
                 id='add-song-button' 
                 value="+" 
                 className={addSongClass}
+                // onClick = {this.handleAddSongButton}
             />
             <input 
                 type="button" 

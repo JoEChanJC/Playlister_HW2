@@ -209,6 +209,18 @@ class App extends React.Component {
     getPlaylistSize = () => {
         return this.state.currentList.songs.length;
     }
+    // createNewSong = () => {
+    //     console.log("hi")
+    //     let list = this.state.currentList
+    //     let newSong = {
+    //         title: "Untitled",
+    //         artist: "Untitled",
+    //         youTubeId: "dQw4w9WgXcQ"
+    //     }
+    //     list.songs.push(newSong);  
+    //     this.setStateWithUpdatedList(list);
+
+    // };
     // THIS FUNCTION MOVES A SONG IN THE CURRENT LIST FROM
     // start TO end AND ADJUSTS ALL OTHER ITEMS ACCORDINGLY
     moveSong(start, end) {
@@ -268,18 +280,32 @@ class App extends React.Component {
     }
     deleteSong = (index) => {
         let currentTitle = this.state.currentList.songs[index].title
+        
         this.setState(prevState => ({
             currentList: prevState.currentList,
             // listKeyPairMarkedForDeletion : song,
             sessionData: prevState.sessionData,
-            currentTitle: currentTitle
+            currentTitle: currentTitle,
+            currentIndex: index
         }), () => {
             this.showDeleteSongModal();
         });
     }
-    confirmDeleteSong = () =>{
-        
+    deleteMarkedSong = () => {
+        this.confirmDeleteSong(this.state.currentIndex);
+        this.hideDeleteSongModal();
     }
+    confirmDeleteSong = (index) =>{
+        console.log(index)
+        // let oldList = this.state.currentList;
+        let list = this.state.currentList;
+
+        if (index >= 0) { 
+            list.songs.splice(index,1); 
+        }
+        
+        this.setStateWithUpdatedList(list);
+    };
 
     editSong = (song, index) => {
         let currentTitle = this.state.currentList.songs[index].title
@@ -304,7 +330,7 @@ class App extends React.Component {
             currentTitle: event.target.value});
     }
     handleNewArtist = (event) => {
-        this.setState({currentArist: event.target.value});
+        this.setState({currentArtist: event.target.value});
     }
     handleNewYouTubeID = (event) => {
         this.setState({currentYouTubeID: event.target.value});
@@ -312,7 +338,7 @@ class App extends React.Component {
     confirmEditSong = () =>{
         let index = this.state.indexToEdit;
         let title = this.state.currentTitle;
-        let artist = this.state.currentArist;
+        let artist = this.state.currentArtist;
         let youtubeID = this.state.currentYouTubeID;
 
         let newCurrentList = this.state.currentList
@@ -363,7 +389,7 @@ class App extends React.Component {
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
         return (
-            <div id="root" onKeyDown={"undo redo ctrl z"}>
+            <div id="root" >
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
@@ -383,6 +409,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
+                    // createNewSongCallback = {this.createNewSong}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
@@ -410,7 +437,7 @@ class App extends React.Component {
                 />
                 <DeleteSongModal
                     currentTitle = {this.state.currentTitle}
-                    deleteSongCallback = {this.confirmDeleteSong}
+                    deleteSongCallback = {this.deleteMarkedSong}
                     hideDeleteSongCallback = {this.hideDeleteSongModal}
                 />
             </div>
