@@ -7,6 +7,8 @@ import jsTPS from './common/jsTPS.js';
 
 // OUR TRANSACTIONS
 import MoveSong_Transaction from './transactions/MoveSong_Transaction.js';
+import AddSong_Transaction from './transactions/AddSong_Transaction';
+import RemoveSong_Transaction from './transactions/RemoveSong_Transaction';
 
 // THESE REACT COMPONENTS ARE MODALS
 import DeleteListModal from './components/DeleteListModal.js';
@@ -19,6 +21,7 @@ import SidebarHeading from './components/SidebarHeading.js';
 import SidebarList from './components/SidebarList.js';
 import Statusbar from './components/Statusbar.js';
 import DeleteSongModal from './components/DeleteSongModal';
+import EditSong_Transaction from './transactions/EditSong_Transaction';
 
 
 class App extends React.Component {
@@ -40,7 +43,9 @@ class App extends React.Component {
             currentList : null,
             sessionData : loadedSessionData
         }
+        
     }
+    
     sortKeyNamePairsByName = (keyNamePairs) => {
         keyNamePairs.sort((keyPair1, keyPair2) => {
             // GET THE LISTS
@@ -91,7 +96,6 @@ class App extends React.Component {
     }
     // THIS FUNCTION BEGINS THE PROCESS OF DELETING A LIST.
     deleteList = (key) => {
-        console.log(key)
         // IF IT IS THE CURRENT LIST, CHANGE THAT
         let newCurrentList = null;
         if (this.state.currentList) {
@@ -224,7 +228,6 @@ class App extends React.Component {
     // start TO end AND ADJUSTS ALL OTHER ITEMS ACCORDINGLY
     moveSong(start, end) {
         let list = this.state.currentList;
-
         // WE NEED TO UPDATE THE STATE FOR THE APP
         start -= 1;
         end -= 1;
@@ -246,10 +249,47 @@ class App extends React.Component {
     }
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
+        
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
     }
+    addAddSongTransaction = (index) => {
+        let transaction = new AddSong_Transaction(this, this.getPlaylistSize());
+        this.tps.addTransaction(transaction)
+    }
+    addRemoveSongTransaction = (index, deletedTitle, deletedArtist, deletedYoutubeID) => {
+        let transaction = new RemoveSong_Transaction(this, index, deletedTitle, deletedArtist, deletedYoutubeID);
+        this.tps.addTransaction(transaction)
+    }
+    addEditSongTransaction = (currentIndex) => {
+        let otitle = this.state.currentList.songs[currentIndex].title
+        let oartist = this.state.currentList.songs[currentIndex].artist
+        let oyoutubeID = this.state.currentList.songs[currentIndex].youtubeId
+        let transaction = new EditSong_Transaction(this, otitle, oartist, oyoutubeID, currentIndex);
+        this.tps.addTransaction(transaction)
+    }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
+    handleKeyDown = (event)=>{
+        let charCode = String.fromCharCode(event.which).toLowerCase();
+        if((event.ctrlKey || event.metaKey)) {
+            if((event.ctrlKey || event.metaKey) && charCode === 'z'){
+                this.undo();
+
+            }
+            else if((event.ctrlKey || event.metaKey) && charCode === 'y') {
+                this.redo();
+            }
+        }
+        else{
+            event.stopPropagation();
+        }
+    }
+    KeyDownSwith(){
+        var saved_keydown = document.onkeydown;
+        document.onkeydown = null;
+
+        document.onkeydown = saved_keydown;
+    }
     undo = () => {
         if (this.tps.hasTransactionToUndo()) {
             this.tps.undoTransaction();
@@ -305,12 +345,23 @@ class App extends React.Component {
         
         this.setStateWithUpdatedList(list);
     };
+    
+    undoDelete(i, deletedTitle, deletedArtist, deletedYoutubeID){
+        let newSong = {
+            title: deletedTitle,
+            artist: deletedArtist,
+            youTubeId: deletedYoutubeID
+        }
+        this.state.currentList.songs.splice(i,0,newSong);
+        this.setStateWithUpdatedList(this.state.currentList);
 
+    }
     editSong = (song, index) => {
+        
         let currentTitle = this.state.currentList.songs[index].title
         let currentArtist = this.state.currentList.songs[index].artist
         let currentYouTubeID = this.state.currentList.songs[index].youTubeId
-
+        
         this.setState(prevState => ({
             currentList: prevState.currentList,
             sessionData: prevState.sessionData,
@@ -339,7 +390,7 @@ class App extends React.Component {
         let title = this.state.currentTitle;
         let artist = this.state.currentArtist;
         let youtubeID = this.state.currentYouTubeID;
-
+        
         let newCurrentList = this.state.currentList
         newCurrentList.songs[index].title = title
         newCurrentList.songs[index].artist = artist
@@ -349,12 +400,21 @@ class App extends React.Component {
             currentList:newCurrentList,
             listKeyPairMarkedForDeletion: prevState.listKeyPairMarkedForDeletion,
             sessionData: prevState.sessionData,
-            indexToEdit: prevState.index
-
+            indexToEdit: index,
+            currentTitle: prevState.currentTitle
         }), () => {
             this.hideEditSongModal();
         });
     };
+
+    reEditSong = (otitle, oartist, oyoutubeID, currentIndex) =>{
+        let list = this.state.currentList
+        list.songs[currentIndex].title = otitle
+        list.songs[currentIndex].artist = oartist
+        list.songs[currentIndex].youTubeID = oyoutubeID
+        this.setStateWithUpdatedList(list);
+
+    }
     // THIS FUNCTION SHOWS THE MODAL FOR PROMPTING THE USER
     // TO SEE IF THEY REALLY WANT TO DELETE THE LIST
     showDeleteListModal() {
@@ -388,7 +448,8 @@ class App extends React.Component {
         let canRedo = this.tps.hasTransactionToRedo();
         let canClose = this.state.currentList !== null;
         return (
-            <div id="root" >
+            <div id="root" onKeyDown={this.handleKeyDown}
+            >
                 <Banner />
                 <SidebarHeading
                     createNewListCallback={this.createNewList}
@@ -408,13 +469,13 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
-                    createNewSongCallback = {this.createNewSong}
+                    createNewSongCallback = {this.addAddSongTransaction}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
                     moveSongCallback={this.addMoveSongTransaction} 
                     editSongCallback = {this.editSong}
-                    deleteSongCallback = {this.deleteSong}
+                    deleteSongCallback = {this.addRemoveSongTransaction}
                 />
                 <Statusbar 
                     currentList={this.state.currentList} />
@@ -425,7 +486,7 @@ class App extends React.Component {
                 />
                 <EditSongModal
                     hideEditSongModalCallback = {this.hideEditSongModal}
-                    editSongCallback = {this.confirmEditSong}
+                    editSongCallback = {this.addEditSongTransaction}
                     handleNewTitle = {this.handleNewTitle}
                     handleNewArtist = {this.handleNewArtist}
                     handleNewYouTubeID = {this.handleNewYouTubeID}

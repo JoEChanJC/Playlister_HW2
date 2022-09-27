@@ -6,19 +6,22 @@ export default class EditSongModal extends Component {
         this.state = {
             title: this.props.currentTitle,
             artist: this.props.currentArtist,
-            youtubeID: this.props.currentYouTubeID
+            youtubeID: this.props.currentYouTubeID,
+            currentIndex: this.props.currentIndex
         };
     }
-
+    handleEditSong = (e) =>{
+        const { editSongCallback} = this.props;
+        editSongCallback(this.props.currentIndex)
+    };
     render() {
         const { currentTitle,
             currentArtist,
             currentYouTubeID, 
-            editSongCallback, 
             hideEditSongModalCallback, 
             handleNewTitle, handleNewArtist, 
             handleNewYouTubeID} = this.props;
-        
+            
         return (
             <div 
                 class="modal" 
@@ -30,7 +33,7 @@ export default class EditSongModal extends Component {
                         </div>
                         <div class="modal-left">
                             <div class="modal-left-content">
-                                Title: <input type="text" value = {currentTitle} class="edit-song-input" id="editTitle" onChange={handleNewTitle}></input>
+                                Title: <input type="text"  value = {currentTitle} class="edit-song-input" id="editTitle" onChange={handleNewTitle}></input>
                             </div>
                         </div>
                         <div class="modal-left">
@@ -47,7 +50,7 @@ export default class EditSongModal extends Component {
                             <input type="button" 
                                 id="delete-list-confirm-button" 
                                 class="modal-button" 
-                                onClick={editSongCallback}
+                                onClick={this.handleEditSong}
                                 value='Confirm' />
                             <input type="button" 
                                 id="delete-list-cancel-button" 

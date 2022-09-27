@@ -18,7 +18,7 @@ export default class SongCard extends React.Component {
     }
     handleDeleteSong = (event) =>{
         event.stopPropagation();
-        this.props.deleteSongCallback(this.props.index);
+        this.props.deleteSongCallback(this.props.index, this.props.songtitle, this.props.songartist, this.props.songyoutubeid);
     }
     handleDragStart = (event) => {
         event.dataTransfer.setData("song", event.target.id);

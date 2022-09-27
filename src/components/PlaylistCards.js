@@ -27,6 +27,8 @@ export default class PlaylistCards extends React.Component {
                                 deleteSongCallback = {deleteSongCallback}
                                 index = {index}
                                 songtitle = {song.title}
+                                songartist = {song.artist}
+                                songyoutubeid = {song.youTubeId}
                             />
                         ))
                     }
