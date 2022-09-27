@@ -249,17 +249,22 @@ class App extends React.Component {
     }
     // THIS FUNCTION ADDS A MoveSong_Transaction TO THE TRANSACTION STACK
     addMoveSongTransaction = (start, end) => {
-        
         let transaction = new MoveSong_Transaction(this, start, end);
         this.tps.addTransaction(transaction);
+        this.db.mutationUpdateList(this.state.currentList);
+
     }
     addAddSongTransaction = (index) => {
         let transaction = new AddSong_Transaction(this, this.getPlaylistSize());
         this.tps.addTransaction(transaction)
+        this.setStateWithUpdatedList(this.state.currentList)
+        this.db.mutationUpdateList(this.state.currentList);
     }
     addRemoveSongTransaction = (index, deletedTitle, deletedArtist, deletedYoutubeID) => {
         let transaction = new RemoveSong_Transaction(this, index, deletedTitle, deletedArtist, deletedYoutubeID);
         this.tps.addTransaction(transaction)
+        this.setStateWithUpdatedList(this.state.currentList)
+        this.db.mutationUpdateList(this.state.currentList);
     }
     addEditSongTransaction = (currentIndex) => {
         let otitle = this.state.currentList.songs[currentIndex].title
@@ -267,6 +272,8 @@ class App extends React.Component {
         let oyoutubeID = this.state.currentList.songs[currentIndex].youtubeId
         let transaction = new EditSong_Transaction(this, otitle, oartist, oyoutubeID, currentIndex);
         this.tps.addTransaction(transaction)
+        this.setStateWithUpdatedList(this.state.currentList)
+        this.db.mutationUpdateList(this.state.currentList);
     }
     // THIS FUNCTION BEGINS THE PROCESS OF PERFORMING AN UNDO
     handleKeyDown = (event)=>{
@@ -307,6 +314,7 @@ class App extends React.Component {
             this.db.mutationUpdateList(this.state.currentList);
         }
     }
+    
     markListForDeletion = (keyPair) => {
         this.setState(prevState => ({
             currentList: prevState.currentList,
