@@ -209,18 +209,17 @@ class App extends React.Component {
     getPlaylistSize = () => {
         return this.state.currentList.songs.length;
     }
-    // createNewSong = () => {
-    //     console.log("hi")
-    //     let list = this.state.currentList
-    //     let newSong = {
-    //         title: "Untitled",
-    //         artist: "Untitled",
-    //         youTubeId: "dQw4w9WgXcQ"
-    //     }
-    //     list.songs.push(newSong);  
-    //     this.setStateWithUpdatedList(list);
+    createNewSong = () => {
+        let list = this.state.currentList
+        let newSong = {
+            title: "Untitled",
+            artist: "Untitled",
+            youTubeId: "dQw4w9WgXcQ"
+        }
+        list.songs.push(newSong);  
+        this.setStateWithUpdatedList(list);
 
-    // };
+    };
     // THIS FUNCTION MOVES A SONG IN THE CURRENT LIST FROM
     // start TO end AND ADJUSTS ALL OTHER ITEMS ACCORDINGLY
     moveSong(start, end) {
@@ -409,7 +408,7 @@ class App extends React.Component {
                     undoCallback={this.undo}
                     redoCallback={this.redo}
                     closeCallback={this.closeCurrentList}
-                    // createNewSongCallback = {this.createNewSong}
+                    createNewSongCallback = {this.createNewSong}
                 />
                 <PlaylistCards
                     currentList={this.state.currentList}
