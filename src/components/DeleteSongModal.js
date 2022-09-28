@@ -1,9 +1,15 @@
 import React, { Component } from 'react';
 
 export default class DeleteSongModal extends Component {
-
+    constructor(props){
+        super(props);
+        this.state = {
+            currentIndex: this.props.currentIndex
+        };
+    }
     render() {
         const {currentTitle, deleteSongCallback, hideDeleteSongCallback } = this.props;
+        console.log(this.currentIndex)
         return (
             <div 
                 class="modal" 
